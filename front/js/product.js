@@ -1,5 +1,4 @@
 // Main
-localStorage.clear();
 productID = new URL(window.location.href).searchParams.get("id");
 fetchItem(productID);
 
@@ -76,7 +75,6 @@ function addToCart(productID, color, quantity) {
 
 function fetchCart() {
   if (localStorage.getItem("cart") == null) {
-    console.log("List is empty");
     let emptyList = JSON.stringify({ productList: [] });
     localStorage.setItem("cart", emptyList);
   }
