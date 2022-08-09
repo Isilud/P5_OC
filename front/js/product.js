@@ -10,6 +10,7 @@ document.getElementById(`addToCart`).addEventListener(`click`, function () {
     console.error("Please check your items informations.");
   } else {
     addToCart(productID, color, quantity);
+    window.location.href = "./cart.html"
   }
 });
 
