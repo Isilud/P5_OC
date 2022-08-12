@@ -105,12 +105,16 @@ function changeQuantity(event) {
   let id = element.closest(".cart__item").dataset.id;
   let color = element.closest(".cart__item").dataset.color;
   let quantity = event.target.value;
-  let productList = fetchCart();
-  index = productList.findIndex((el) => {
-    return (el.id == id && el.color == color);
-  });
-  productList[index].quantity = quantity;
-  setCart(productList);
+  if (quantity >= 1 && quantity <= 100) {
+    let productList = fetchCart();
+    index = productList.findIndex((el) => {
+      return el.id == id && el.color == color;
+    });
+    productList[index].quantity = quantity;
+    setCart(productList);
+  } else {
+    alert("Please enter a number in the range 1~100")
+  }
 }
 
 function fetchCart() {
