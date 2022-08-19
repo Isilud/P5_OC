@@ -2,47 +2,7 @@
 
 async function Main() {
   updatePage();
-  form = document.getElementsByClassName("cart__order__form")[0];
-  form.addEventListener("submit", async (event) => {
-    event.stopImmediatePropagation();
-    event.preventDefault();
-    for (element of document.querySelectorAll(
-      ".cart__order__form__question input"
-    )) {
-      if (!dataCheck(element.id)) {
-        alert("Form contain error");
-        return;
-      }
-    }
-    query = prepareQuery();
-    console.log(query);
-    message = await fetch("http://localhost:3000/api/products/order/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: query,
-    })
-      .then((result) => {
-        return result.json();
-      })
-      .catch((err) => {
-        console.log(err);
-        return nil;
-      });
-    console.log(message);
-  });
-  for (element of document.querySelectorAll(
-    ".cart__order__form__question input"
-  )) {
-    element.addEventListener("change", function () {
-      if (dataCheck(this.id)) {
-        this.style.background = "#98FB98";
-      } else {
-        this.style.background = "#FAA0A0";
-      }
-    });
-  }
+  setForm();
 }
 
 Main();
@@ -219,4 +179,47 @@ function prepareQuery() {
     query["products"].push(product.id);
   }
   return JSON.stringify(query);
+}
+
+function setForm() {
+  form = document.getElementsByClassName("cart__order__form")[0];
+  form.addEventListener("submit", async (event) => {
+    event.stopImmediatePropagation();
+    event.preventDefault();
+    for (element of document.querySelectorAll(
+      ".cart__order__form__question input"
+    )) {
+      if (!dataCheck(element.id)) {
+        alert("Form contain error");
+        return;
+      }
+    }
+    query = prepareQuery();
+    response = await fetch("http://localhost:3000/api/products/order/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: query,
+    })
+      .then((result) => {
+        return result.json();
+      })
+      .catch((err) => {
+        console.log(err);
+        return nil;
+      });
+      console.log(response)
+  });
+  for (element of document.querySelectorAll(
+    ".cart__order__form__question input"
+  )) {
+    element.addEventListener("change", function () {
+      if (dataCheck(this.id)) {
+        this.style.background = "#98FB98";
+      } else {
+        this.style.background = "#FAA0A0";
+      }
+    });
+  }
 }
