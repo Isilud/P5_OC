@@ -2,6 +2,7 @@
 
 async function Main() {
   updatePage();
+  setForm();
 }
 
 Main();
@@ -98,6 +99,11 @@ function deleteItem(event) {
     return item.id != id || item.color != color;
   });
   setCart(newList);
+  if (newList.length == 0) {
+    alert("The cart is empty, returning to the index.");
+    window.location.href = "./index.html";
+    localStorage.removeItem("cart");
+  }
 }
 
 function changeQuantity(event) {
@@ -113,7 +119,7 @@ function changeQuantity(event) {
     productList[index].quantity = quantity;
     setCart(productList);
   } else {
-    alert("Please enter a number in the range 1~100")
+    alert("Please enter a number in the range 1~100");
   }
 }
 
@@ -128,4 +134,92 @@ function fetchCart() {
 function setCart(productList) {
   cart = { productList: productList };
   localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function dataCheck(id) {
+  switch (id) {
+    case "firstName":
+      return /^([A-Z]|[ÉÈÇÀÙ]){1}([a-z]|[éèçàù])*(-?([A-Z]|[ÉÈÇÀÙ]){1}([a-z]|[éèçàù])*)*\S$/.test(
+        document.getElementById(id).value
+      );
+    case "lastName":
+      return /^([A-Z]|[ÉÈÇÀÙ]){1}([a-z]|[éèçàù])*(-?([A-Z]|[ÉÈÇÀÙ]){1}([a-z]|[éèçàù])*)*\S$/.test(
+        document.getElementById(id).value
+      );
+    case "address":
+      return /^[0-9]{1,}((\s|-){1}([A-Z]|[ÉÈÇÀÙ]|[a-z]|[éèçàù]|[0-9]){1,}){1,}$/.test(
+        document.getElementById(id).value
+      );
+    case "city":
+      return /^([A-Z]|[ÉÈÇÀÙ])*([a-z]|[éèçàù])*(-?([A-Z]|[ÉÈÇÀÙ])*([a-z]|[éèçàù])*)*\S$/.test(
+        document.getElementById(id).value
+      );
+    case "email":
+      return /^([A-Z]|[ÉÈÇÀÙ]|[a-z]|[éèçàù]|[0-9]|\.){1,}@{1}([A-Z]|[ÉÈÇÀÙ]|[a-z]|[éèçàù]|[0-9]){1,}\.{1}[a-z]{1,}/.test(
+        document.getElementById(id).value
+      );
+    default:
+      console.log("Unexpected case");
+  }
+}
+
+function prepareQuery() {
+  query = {
+    contact: {
+      firstName: document.getElementById("firstName").value,
+      lastName: document.getElementById("lastName").value,
+      address: document.getElementById("address").value,
+      city: document.getElementById("city").value,
+      email: document.getElementById("email").value,
+    },
+    products: [],
+  };
+  productList = fetchCart();
+  for (product of productList) {
+    query["products"].push(product.id);
+  }
+  return JSON.stringify(query);
+}
+
+function setForm() {
+  form = document.getElementsByClassName("cart__order__form")[0];
+  form.addEventListener("submit", async (event) => {
+    event.stopImmediatePropagation();
+    event.preventDefault();
+    for (element of document.querySelectorAll(
+      ".cart__order__form__question input"
+    )) {
+      if (!dataCheck(element.id)) {
+        alert("Form contain error");
+        return;
+      }
+    }
+    query = prepareQuery();
+    response = await fetch("http://localhost:3000/api/products/order/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: query,
+    })
+      .then((result) => {
+        return result.json();
+      })
+      .catch((err) => {
+        console.log(err);
+        return nil;
+      });
+      console.log(response)
+  });
+  for (element of document.querySelectorAll(
+    ".cart__order__form__question input"
+  )) {
+    element.addEventListener("change", function () {
+      if (dataCheck(this.id)) {
+        this.style.background = "#98FB98";
+      } else {
+        this.style.background = "#FAA0A0";
+      }
+    });
+  }
 }
