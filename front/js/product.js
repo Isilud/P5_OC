@@ -6,11 +6,10 @@ document.getElementById(`addToCart`).addEventListener(`click`, function () {
   let color = document.getElementById(`colors`).value;
   let quantity = document.getElementById(`quantity`).value;
   quantity = parseInt(quantity);
-  if (quantity == 0 || color == "") {
-    console.error("Please check your items informations.");
-  } else {
-    addToCart(productID, color, quantity);
-    window.location.href = "./cart.html"
+  isAdded = addToCart(productID, color, quantity);
+  if (isAdded) {
+    alert("A new item is added to your cart.")
+    window.location.href = "./cart.html";
   }
 });
 
@@ -55,6 +54,14 @@ function showItem(item) {
 }
 
 function addToCart(productID, color, quantity) {
+  if (quantity == 0 || quantity < 1 || quantity > 100) {
+    alert("Please enter a number in the range 1~100");
+    return false;
+  }
+  if (color == "") {
+    alert("Please choose a color");
+    return false;
+  }
   // On définit le produit en cours et on récupére le panier présent
   newProduct = { id: productID, color: color, quantity: quantity };
   let productList = fetchCart();
@@ -72,6 +79,7 @@ function addToCart(productID, color, quantity) {
 
   // On met à jour notre panier dans le storage.
   setCart(productList);
+  return true;
 }
 
 function fetchCart() {
