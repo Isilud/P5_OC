@@ -14,28 +14,29 @@ async function updatePage() {
   let cart = JSON.parse(localStorage.getItem("cart"));
 
   clearData();
+  try {
+    for (product of cart["productList"]) {
+      item = await fetchItem(product.id);
+      injectData(item, product.color, product.quantity);
+      totalPrice += item.price * product.quantity;
+      totalQuantity += product.quantity;
+    }
+    injectTotal(totalPrice, totalQuantity);
 
-  for (product of cart["productList"]) {
-    item = await fetchItem(product.id);
-    injectData(item, product.color, product.quantity);
-    totalPrice += item.price * product.quantity;
-    totalQuantity += product.quantity;
-  }
-  injectTotal(totalPrice, totalQuantity);
+    for (element of document.getElementsByClassName("deleteItem")) {
+      element.addEventListener("click", function (event) {
+        deleteItem(event);
+        updatePage();
+      });
+    }
 
-  for (element of document.getElementsByClassName("deleteItem")) {
-    element.addEventListener("click", function (event) {
-      deleteItem(event);
-      updatePage();
-    });
-  }
-
-  for (element of document.getElementsByClassName("itemQuantity")) {
-    element.addEventListener("change", function (event) {
-      changeQuantity(event);
-      updatePage();
-    });
-  }
+    for (element of document.getElementsByClassName("itemQuantity")) {
+      element.addEventListener("change", function (event) {
+        changeQuantity(event);
+        updatePage();
+      });
+    }
+  } catch {}
 }
 
 async function fetchItem(id) {
@@ -124,11 +125,16 @@ function changeQuantity(event) {
 }
 
 function fetchCart() {
-  if (localStorage.getItem("cart") == null) {
-    let emptyList = JSON.stringify({ productList: [] });
-    localStorage.setItem("cart", emptyList);
+  try {
+    if (localStorage.getItem("cart") == null) {
+      let emptyList = JSON.stringify({ productList: [] });
+      localStorage.setItem("cart", emptyList);
+    }
+  } catch {
+    return [];
+  } finally {
+    return JSON.parse(localStorage.getItem("cart"))["productList"];
   }
-  return JSON.parse(localStorage.getItem("cart"))["productList"];
 }
 
 function setCart(productList) {
@@ -139,9 +145,6 @@ function setCart(productList) {
 function dataCheck(id) {
   switch (id) {
     case "firstName":
-      return /^([A-Z]|[ÉÈÇÀÙ]){1}([a-z]|[éèçàù])*(-?([A-Z]|[ÉÈÇÀÙ]){1}([a-z]|[éèçàù])*)*\S$/.test(
-        document.getElementById(id).value
-      );
     case "lastName":
       return /^([A-Z]|[ÉÈÇÀÙ]){1}([a-z]|[éèçàù])*(-?([A-Z]|[ÉÈÇÀÙ]){1}([a-z]|[éèçàù])*)*\S$/.test(
         document.getElementById(id).value
@@ -151,7 +154,7 @@ function dataCheck(id) {
         document.getElementById(id).value
       );
     case "city":
-      return /^([A-Z]|[ÉÈÇÀÙ])*([a-z]|[éèçàù])*(-?([A-Z]|[ÉÈÇÀÙ])*([a-z]|[éèçàù])*)*\S$/.test(
+      return /^([A-Z]|[ÉÈÇÀÙ])+([a-z]|[éèçàù])*((-\s)?([A-Z]|[ÉÈÇÀÙ])*([a-z]|[éèçàù])*)*\S$/.test(
         document.getElementById(id).value
       );
     case "email":
@@ -186,6 +189,10 @@ function setForm() {
   form.addEventListener("submit", async (event) => {
     event.stopImmediatePropagation();
     event.preventDefault();
+    if (fetchCart().length == 0) {
+      alert("Aucun article dans le panier.");
+      return;
+    }
     for (element of document.querySelectorAll(
       ".cart__order__form__question input"
     )) {
@@ -209,7 +216,7 @@ function setForm() {
         console.log(err);
         return nil;
       });
-      console.log(response)
+    window.location.href = `./confirmation.html?order=${response.orderId}`;
   });
   for (element of document.querySelectorAll(
     ".cart__order__form__question input"
