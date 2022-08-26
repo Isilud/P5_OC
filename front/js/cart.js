@@ -101,7 +101,7 @@ function deleteItem(event) {
   });
   setCart(newList);
   if (newList.length == 0) {
-    alert("The cart is empty, returning to the index.");
+    alert("Le panier est vide, retour à l'accueil.");
     window.location.href = "./index.html";
     localStorage.removeItem("cart");
   }
@@ -120,7 +120,7 @@ function changeQuantity(event) {
     productList[index].quantity = quantity;
     setCart(productList);
   } else {
-    alert("Please enter a number in the range 1~100");
+    alert("Veuillez entrer un nombre entre 0 et 100");
   }
 }
 
@@ -197,7 +197,7 @@ function setForm() {
       ".cart__order__form__question input"
     )) {
       if (!dataCheck(element.id)) {
-        alert("Form contain error");
+        alert("Le formulaire contient des erreurs, veuillez vérifier vos informations.");
         return;
       }
     }

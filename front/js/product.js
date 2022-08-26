@@ -8,7 +8,7 @@ document.getElementById(`addToCart`).addEventListener(`click`, function () {
   quantity = parseInt(quantity);
   isAdded = addToCart(productID, color, quantity);
   if (isAdded) {
-    alert("A new item is added to your cart.")
+    alert("L'article a été ajoutéau panier.")
     window.location.href = "./cart.html";
   }
 });
@@ -55,11 +55,11 @@ function showItem(item) {
 
 function addToCart(productID, color, quantity) {
   if (quantity == 0 || quantity < 1 || quantity > 100) {
-    alert("Please enter a number in the range 1~100");
+    alert("Veuillez entrer un nombre entre 0 et 100");
     return false;
   }
   if (color == "") {
-    alert("Please choose a color");
+    alert("Veuillez choisir une couleur.");
     return false;
   }
   // On définit le produit en cours et on récupére le panier présent
