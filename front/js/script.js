@@ -1,35 +1,25 @@
+import { request } from "./utils.js";
+
 // Main
 
-fetchItemList();
+let items = await request("http://localhost:3000/api/products");
+show(items);
 
-// Functions Store
-
-function fetchItemList() {
-  fetch("http://localhost:3000/api/products")
-    .then((data) => {
-      if (data.ok) {
-        return data.json();
-      }
-    })
-    .then((items) => {
-      show(items);
-    })
-    .catch((err) => {
-      console.log(err);
-      return nil;
-    });
-};
-
+// Inject all given items in the page
 function show(items) {
-  for (item of items) {
+  let element = document.getElementById("items");
+
+  // For each given item
+  for (let item of items) {
+    // Create an element
     const newItem = document.createElement("a");
     newItem.href = `./product.html?id=${item._id}`;
     newItem.innerHTML = `<article>
     <img src="${item.imageUrl}" alt="${item.altTxt}">
     <h3 class="productName">${item.name}</h3>
     <p class="productDescription">${item.description}</p>
-  </article>`;
-    let element = document.getElementById("items");
+    </article>`;
+    // Inject the element
     element.appendChild(newItem);
   }
 }
